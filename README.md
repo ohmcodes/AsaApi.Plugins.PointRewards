@@ -174,3 +174,5 @@ Feel free to join my Discord server [ArkTools](https://discord.gg/q8rPGprjEJ)
 
 # Give Love!
 [Buy me a coffee](https://www.buymeacoffee.com/ohmcodes)
+
+[Paypal](https://www.paypal.com/donate/?business=8389QZ23QRDPE&no_recurring=0&item_name=Game+Server%2FTools+Community+Donations&currency_code=CAD)
