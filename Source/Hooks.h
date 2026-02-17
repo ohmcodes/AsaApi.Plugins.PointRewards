@@ -4,7 +4,6 @@ DECLARE_HOOK(APrimalDinoCharacter_Die, bool, APrimalDinoCharacter*, float, FDama
 bool Hook_APrimalDinoCharacter_Die(APrimalDinoCharacter* _this, float KillingDamage, FDamageEvent* DamageEvent,
     AController* Killer, AActor* DamageCauser)
 {
-    Log::GetLog()->info("Killing dino");
 
     if (Killer && !Killer->IsLocalController() && Killer->IsA(AShooterPlayerController::GetPrivateStaticClass()) &&
         _this->TargetingTeamField() != Killer->TargetingTeamField())
@@ -109,6 +108,8 @@ bool Hook_APrimalDinoCharacter_Die(APrimalDinoCharacter* _this, float KillingDam
             AddOrUpdatePlayerStats(eos_id, killer_shooter_pc->GetLinkedPlayerID(), killername, StatsType::TamedKill);
             tamed = "tamed";
         }
+
+        Log::GetLog()->info("Killing dino");
 
         std::string msg = fmt::format(PointRewards::config["Messages"].value("DCDinoKilledMSG", "Player Killed a {} dino. Points given {}").c_str(), tamed, points_given);
 

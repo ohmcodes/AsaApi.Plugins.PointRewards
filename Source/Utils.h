@@ -435,13 +435,13 @@ int GetStatAmount(FString eosID, StatsType statsType)
 		break;
 	};
 
-	if (results.size() <= 0)
+	if (results.size() > 0)
 	{
 		return std::atoi(results[0].at(stats_field).c_str());
 	}
 	else
 	{
-		return -1;
+		return 0;
 	}
 }
 
@@ -455,21 +455,22 @@ bool AddOrUpdatePlayerStats(FString eosID, int playerID, FString playerName, Sta
 
 	std::vector<std::pair<std::string, std::string>> data2 = {};
 
-	int amount = GetStatAmount(eosID, statsType) + 1;
+	int current_amount = GetStatAmount(eosID, statsType);
+	int new_amount = (current_amount <= 0) ? 1 : current_amount + 1;
 
 	switch (statsType)
 	{
 		case StatsType::PlayerKill:
-			data2.push_back({ "Kill" ,std::to_string(amount) });
+			data2.push_back({ "Kill" ,std::to_string(new_amount) });
 			break;
 		case StatsType::PlayerDeath:
-			data2.push_back({ "Death" ,std::to_string(amount) });
+			data2.push_back({ "Death" ,std::to_string(new_amount) });
 			break;
 		case StatsType::DinoKill:
-			data2.push_back({ "DinoKill" ,std::to_string(amount) });
+			data2.push_back({ "DinoKill" ,std::to_string(new_amount) });
 			break;
 		case StatsType::TamedKill:
-			data2.push_back({ "TamedKill" ,std::to_string(amount) });
+			data2.push_back({ "TamedKill" ,std::to_string(new_amount) });
 			break;
 	};
 
@@ -484,20 +485,19 @@ bool AddOrUpdatePlayerStats(FString eosID, int playerID, FString playerName, Sta
 
 			std::string condition = fmt::format("{}='{}'", unique_id, escaped_id);
 
-			PointRewards::pluginTemplateDB->update(PointRewards::config["PluginDBSettings"]["TableName"].get<std::string>(), data2, condition);
+			return PointRewards::pluginTemplateDB->update(PointRewards::config["PluginDBSettings"]["TableName"].get<std::string>(), data2, condition);
 		}
 		else
 		{
 			//create stats
 			data1.insert(data1.end(), data2.begin(), data2.end());
 
-			PointRewards::pluginTemplateDB->create(PointRewards::config["PluginDBSettings"]["TableName"].get<std::string>(), data1);
+			return PointRewards::pluginTemplateDB->create(PointRewards::config["PluginDBSettings"]["TableName"].get<std::string>(), data1);
 		}
-
-		return true;
 	}
-	catch (std::exception error)
+	catch (const std::exception& error)
 	{
+		Log::GetLog()->error("Error in AddOrUpdatePlayerStats: {}", error.what());
 		return false;
 	}
 }
