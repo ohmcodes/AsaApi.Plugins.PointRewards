@@ -51,7 +51,6 @@ bool Hook_APrimalDinoCharacter_Die(APrimalDinoCharacter* _this, float KillingDam
                                 if (points >= 0)
                                 {
                                     AddSubPoints(eos_id, points, true, false);
-
                                 }
                                 else if (negative_points || GetPoints(eos_id) - abs(points) >= 0)
                                 {
@@ -85,6 +84,10 @@ bool Hook_APrimalDinoCharacter_Die(APrimalDinoCharacter* _this, float KillingDam
                                                 PointRewards::config["Messages"].value("LostPointsMSG", "You have lost {} points").c_str(),
                                                 abs(points));
                                         }
+
+                                        std::string msg = fmt::format(PointRewards::config["Messages"].value("DCDinoKilledMSG", "Player Killed a {}. Points given {}").c_str(), _this->DescriptiveNameField().ToString(), points_given);
+
+                                        SendMessageToDiscord(msg);
                                     }
                                 }
 
@@ -95,25 +98,14 @@ bool Hook_APrimalDinoCharacter_Die(APrimalDinoCharacter* _this, float KillingDam
                 }
             }
         }
-
-        std::string tamed = "";
-
         if (_this->TargetingTeamField() < 50000)
         {
             AddOrUpdatePlayerStats(eos_id, killer_shooter_pc->GetLinkedPlayerID(), killername, StatsType::DinoKill);
-            tamed = "wild";
         }
         else
         {
             AddOrUpdatePlayerStats(eos_id, killer_shooter_pc->GetLinkedPlayerID(), killername, StatsType::TamedKill);
-            tamed = "tamed";
         }
-
-        Log::GetLog()->info("Killing dino");
-
-        std::string msg = fmt::format(PointRewards::config["Messages"].value("DCDinoKilledMSG", "Player Killed a {} dino. Points given {}").c_str(), tamed, points_given);
-
-        SendMessageToDiscord(msg);
     }
 
     return APrimalDinoCharacter_Die_original(_this, KillingDamage, DamageEvent, Killer, DamageCauser);

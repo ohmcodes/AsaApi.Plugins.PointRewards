@@ -17,7 +17,7 @@
     "LostPointsMSG": "You have lost {} points",
     "GainPointsMSG": "You have gain {} points",
     "DCPlayerKilledMSG": "Player {} ({}) has been killed by {} ({})",
-    "DCDinoKilledMSG": "Player Killed a {} dino. Points given {}",
+    "DCDinoKilledMSG": "Player Killed a {}. Points given {}",
     "MyStatsMSG": "Kills ({}), Deaths ({}), Dino Kills ({}), Tamed Kills ({})",
     "MyLBStatsMSG": "Rank: Player Kill ({}), Player Death ({}), Dino Kill ({}), Tamed Kill ({})"
   },
