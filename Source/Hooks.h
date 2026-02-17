@@ -52,16 +52,18 @@ bool Hook_APrimalDinoCharacter_Die(APrimalDinoCharacter* _this, float KillingDam
                                 AShooterPlayerController* killer_controller = AsaApi::GetApiUtils().FindPlayerFromEOSID(eos_id);
                                 //AShooterPlayerController* killer_controlle = static_cast<AShooterPlayerController*>(Killer)
                                 std::string msgPoints = "GainPointsMSG";
-
+                                FColor msgColor = FColorList::Red;
                                 if (points >= 0)
                                 {
                                     AddSubPoints(eos_id, points, true, false);
                                     msgPoints = "GainPointsMSG";
+                                    msgColor = FColorList::Green;
                                 }
                                 else if (negative_points || GetPoints(eos_id) - abs(points) >= 0)
                                 {
                                     AddSubPoints(eos_id, points, false, false);
                                     msgPoints = "LostPointsMSG";
+                                    msgColor = FColorList::Red;
                                 }
 
                                 if (killer_controller)
@@ -75,7 +77,7 @@ bool Hook_APrimalDinoCharacter_Die(APrimalDinoCharacter* _this, float KillingDam
 
                                         AsaApi::GetApiUtils().SendNotification(
                                             killer_controller,
-                                            FColorList::Red,
+                                            msgColor,
                                             display_scale,
                                             display_time,
                                             nullptr,
