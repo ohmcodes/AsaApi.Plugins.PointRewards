@@ -29,8 +29,7 @@
     <ClInclude Include="Source\Public\Database\SQLiteConnector.h" />
     <ClInclude Include="Source\Public\PointRewards.h" />
     <ClInclude Include="Source\Reload.h" />
-    <ClInclude Include="Source\RepairItems.h" />
-    <ClInclude Include="Source\Timers.h" />
+    <ClInclude Include="Source\Stats.h" />
     <ClInclude Include="Source\Utils.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

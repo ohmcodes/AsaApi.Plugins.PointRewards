@@ -209,7 +209,7 @@ bool Hook_AShooterCharacter_Die(AShooterCharacter* shooter_character, float Kill
 
         AddOrUpdatePlayerStats(victim_eos_id, victim_shooter_pc->GetLinkedPlayerID(), playername, StatsType::PlayerDeath);
 
-        std::string msg = fmt::format(PointRewards::config["Messages"].value("DiscordMSG", "Player {} ({}) has been killed by {} ({})").c_str(), playername, lose_points, killername, receive_points);
+        std::string msg = fmt::format(PointRewards::config["Messages"].value("DiscordMSG", "Player {} ({}) has been killed by {} ({})").c_str(), playername.ToString(), lose_points, killername.ToString(), receive_points);
 
         SendMessageToDiscord(msg);
     }
