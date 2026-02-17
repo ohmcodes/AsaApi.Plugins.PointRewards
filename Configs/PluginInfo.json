@@ -1,0 +1,6 @@
+{
+  "FullName": "PointRewards",
+  "Description": "Point reward player when killing dinos",
+  "Version": 1,
+  "MinApiVersion": 1.18
+}
