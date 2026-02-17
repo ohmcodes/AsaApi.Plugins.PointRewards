@@ -639,10 +639,10 @@ void LoadDatabase()
 			{"EosId", "VARCHAR(50) NOT NULL"},
 			{"PlayerId", "VARCHAR(50) NOT NULL"},
 			{"PlayerName", "VARCHAR(50) NOT NULL"},
-			{"Kill", "INT"},
-			{"Death", "INT"},
-			{"DinoKill", "INT"},
-			{"TamedKill", "INT"},
+			{"Kill", "INT DEFAULT 0"},
+			{"Death", "INT DEFAULT 0"},
+			{"DinoKill", "INT DEFAULT 0"},
+			{"TamedKill", "INT DEFAULT 0"},
 			{"CreateAt", "DATETIME DEFAULT CURRENT_TIMESTAMP"},
 			{"PRIMARY", "KEY(Id)"},
 			{"UNIQUE", "INDEX EosId_UNIQUE (EosId ASC)"}
@@ -655,10 +655,10 @@ void LoadDatabase()
 			{"EosId","TEXT NOT NULL UNIQUE"},
 			{"PlayerId","TEXT"},
 			{"PlayerName","TEXT"},
-			{"Kill", "INTEGER"},
-			{"Death", "INTEGER"},
-			{"DinoKill", "INTEGER"},
-			{"TamedKill", "INTEGER"},
+			{"Kill", "INTEGER DEFAULT 0"},
+			{"Death", "INTEGER DEFAULT 0"},
+			{"DinoKill", "INTEGER DEFAULT 0"},
+			{"TamedKill", "INTEGER DEFAULT 0"},
 			{"CreateAt","TIMESTAMP DEFAULT CURRENT_TIMESTAMP"}
 		};
 	}
