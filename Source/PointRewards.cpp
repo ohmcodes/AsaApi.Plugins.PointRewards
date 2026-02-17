@@ -4,11 +4,9 @@
 
 #include "Utils.h"
 
-#include "RepairItems.h"
+#include "Stats.h"
 
 #include "Hooks.h"
-
-#include "Timers.h"
 
 #include "Commands.h"
 
@@ -27,7 +25,6 @@ void OnServerReady()
 	LoadDatabase();
 	AddOrRemoveCommands();
 	AddReloadCommands();
-	SetTimers();
 	SetHooks();
 }
 
@@ -55,6 +52,5 @@ extern "C" __declspec(dllexport) void Plugin_Unload()
 
 	AddOrRemoveCommands(false);
 	AddReloadCommands(false);
-	SetTimers(false);
 	SetHooks(false);
 }

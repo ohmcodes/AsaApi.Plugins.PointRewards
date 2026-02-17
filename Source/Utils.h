@@ -2,97 +2,6 @@
 #include <fstream>
 
 
-static bool startsWith(const std::string& str, const std::string& prefix)
-{
-	return str.size() >= prefix.size() && str.compare(0, prefix.size(), prefix) == 0;
-}
-
-void FetchMessageFromDiscordCallback(bool success, std::string results)
-{
-	//Log::GetLog()->warn("Function: {}", __FUNCTION__);
-
-	if (success)
-	{
-		if(results.empty()) return;
-
-		try
-		{
-			nlohmann::json resObj = nlohmann::json::parse(results)[0];
-
-			if (resObj.is_null())
-			{
-				Log::GetLog()->warn("resObj is null");
-				return;
-			}
-
-			auto globalName = resObj["author"]["global_name"];
-
-			// if not sent by bot
-			if (resObj.contains("bot") && globalName.is_null())
-			{
-				Log::GetLog()->warn("the sender is bot");
-				return;
-			}
-
-			std::string msg = resObj["content"].get<std::string>();
-			
-			if (!startsWith(msg, "!"))
-			{
-				Log::GetLog()->warn("message not startswith !");
-				return;
-			}
-
-			if (PointRewards::lastMessageID == resObj["id"].get<std::string>()) return;
-			
-			std::string sender = fmt::format("Discord: {}", globalName.get<std::string>());
-
-			AsaApi::GetApiUtils().SendChatMessageToAll(FString(sender), msg.c_str());
-
-			PointRewards::lastMessageID = resObj["id"].get<std::string>();
-		}
-		catch (std::exception& error)
-		{
-			Log::GetLog()->error("Error parsing JSON results. Error: {}",error.what());
-		}
-	}
-	else
-	{
-		Log::GetLog()->warn("Failed to fetch messages. success: {}", success);
-	}
-}
-
-void FetchMessageFromDiscord()
-{
-	//Log::GetLog()->warn("Function: {}", __FUNCTION__);
-
-	std::string botToken = PointRewards::config["DiscordBot"].value("BotToken","");
-
-	std::string channelID = PointRewards::config["DiscordBot"].value("ChannelID", "");
-
-	std::string apiURL = FString::Format("https://discord.com/api/v10/channels/{}/messages?limit=1", channelID).ToString();
-
-	std::vector<std::string> headers = {
-		"Content-Type: application/json",
-		"User-Agent: PointRewards/1.0",
-		"Connection: keep-alive",
-		"Accept: */*",
-		"Content-Length: 0",
-		"Authorization: Bot " + botToken
-	};
-
-	try
-	{
-		bool req = PointRewards::req.CreateGetRequest(apiURL, FetchMessageFromDiscordCallback, headers);
-
-		if (!req)
-			Log::GetLog()->error("Failed to perform Get request. req = {}", req);
-	}
-	catch (const std::exception& error)
-	{
-		Log::GetLog()->error("Failed to perform Get request. Error: {}", error.what());
-	}
-}
-
 void SendMessageToDiscordCallback(bool success, std::string results, std::unordered_map<std::string, std::string> responseHeaders)
 {
 	if (!success)
@@ -606,42 +515,89 @@ nlohmann::basic_json<> GetDinoConfig(const std::string& blueprint)
 	return nlohmann::json::value_type::object();
 }
 
-
-
-
-bool AddPlayer(FString eosID, int playerID, FString playerName)
+PlayerRanks GetPlayerRanks(FString eosID)
 {
-	std::vector<std::pair<std::string, std::string>> data = {
-		{"EosId", eosID.ToString()},
-		{"PlayerId", std::to_string(playerID)},
-		{"PlayerName", playerName.ToString()}
-	};
+	PlayerRanks ranks;
+	std::string escaped_id = PointRewards::pluginTemplateDB->escapeString(eosID.ToString());
+	std::string tableName = PointRewards::config["PluginDBSettings"]["TableName"].get<std::string>();
 
-	return PointRewards::pluginTemplateDB->create(PointRewards::config["PluginDBSettings"]["TableName"].get<std::string>(), data);
+	// Get Kill rank
+	std::string killQuery = fmt::format(
+		"SELECT COUNT(*) + 1 as rank FROM {} p1 WHERE p1.Kill > (SELECT Kill FROM {} p2 WHERE p2.EosId = '{}')",
+		tableName, tableName, escaped_id
+	);
+
+	// Get Death rank (lower is better, so reverse the comparison)
+	std::string deathQuery = fmt::format(
+		"SELECT COUNT(*) + 1 as rank FROM {} p1 WHERE p1.Death < (SELECT Death FROM {} p2 WHERE p2.EosId = '{}')",
+		tableName, tableName, escaped_id
+	);
+
+	// Get DinoKill rank
+	std::string dinoKillQuery = fmt::format(
+		"SELECT COUNT(*) + 1 as rank FROM {} p1 WHERE p1.DinoKill > (SELECT DinoKill FROM {} p2 WHERE p2.EosId = '{}')",
+		tableName, tableName, escaped_id
+	);
+
+	// Get TamedKill rank
+	std::string tamedKillQuery = fmt::format(
+		"SELECT COUNT(*) + 1 as rank FROM {} p1 WHERE p1.TamedKill > (SELECT TamedKill FROM {} p2 WHERE p2.EosId = '{}')",
+		tableName, tableName, escaped_id
+	);
+
+	std::vector<std::map<std::string, std::string>> results;
+
+	// Execute Kill rank query
+	if (PointRewards::pluginTemplateDB->read(killQuery, results) && !results.empty())
+	{
+		ranks.killRank = std::atoi(results[0]["rank"].c_str());
+	}
+
+	// Execute Death rank query
+	results.clear();
+	if (PointRewards::pluginTemplateDB->read(deathQuery, results) && !results.empty())
+	{
+		ranks.deathRank = std::atoi(results[0]["rank"].c_str());
+	}
+
+	// Execute DinoKill rank query
+	results.clear();
+	if (PointRewards::pluginTemplateDB->read(dinoKillQuery, results) && !results.empty())
+	{
+		ranks.dinoKillRank = std::atoi(results[0]["rank"].c_str());
+	}
+
+	// Execute TamedKill rank query
+	results.clear();
+	if (PointRewards::pluginTemplateDB->read(tamedKillQuery, results) && !results.empty())
+	{
+		ranks.tamedKillRank = std::atoi(results[0]["rank"].c_str());
+	}
+
+	return ranks;
 }
 
-bool UpdatePlayer(FString eosID, FString playerName)
+void GetPlayerStats(AShooterPlayerController* pc)
 {
-	std::string unique_id = "EosId";
 
-	std::string escaped_id = PointRewards::pluginTemplateDB->escapeString(eosID.ToString());
-
-	std::vector<std::pair<std::string, std::string>> data = {
-		{"PlayerName", playerName.ToString() + "123"}
-	};
-
-	std::string condition = fmt::format("{}='{}'", unique_id, escaped_id);
-
-	return PointRewards::pluginTemplateDB->update(PointRewards::config["PluginDBSettings"]["TableName"].get<std::string>(), data, condition);
+	AsaApi::GetApiUtils().SendChatMessage(
+		pc,
+		PointRewards::config["Messages"].value("Sender", "Point Rewards").c_str(),
+		PointRewards::config["Messages"].value("MyStatsMSG", "Kills ({}), Deaths ({}), Dino Kills ({}), Tamed Kills ({})").c_str(),
+		GetStatAmount(pc->GetEOSId(), StatsType::PlayerKill),
+		GetStatAmount(pc->GetEOSId(), StatsType::PlayerDeath),
+		GetStatAmount(pc->GetEOSId(), StatsType::DinoKill),
+		GetStatAmount(pc->GetEOSId(), StatsType::TamedKill));
 }
 
-bool DeletePlayer(FString eosID)
+void GetPlayerStatsWithRanks(AShooterPlayerController* pc)
 {
-	std::string escaped_id = PointRewards::pluginTemplateDB->escapeString(eosID.ToString());
+	PlayerRanks ranks = GetPlayerRanks(pc->GetEOSId());
 
-	std::string condition = fmt::format("EosId='{}'", escaped_id);
-
-	return PointRewards::pluginTemplateDB->deleteRow(PointRewards::config["PluginDBSettings"]["TableName"].get<std::string>(), condition);
+	AsaApi::GetApiUtils().SendChatMessage(
+		pc,
+		PointRewards::config["Messages"].value("Sender", "Point Rewards").c_str(),
+		PointRewards::config["Messages"].value("MyLBStatsMSG", "Rank: Player Kill ({}), Player Death ({}), Dino Kill ({}), Tamed Kill ({})").c_str(), ranks.killRank, ranks.deathRank, ranks.dinoKillRank, ranks.tamedKillRank);
 }
 
 void ReadConfig()

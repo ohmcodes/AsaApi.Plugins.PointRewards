@@ -1,44 +1,46 @@
 {
   "General": {
-    "Debug": true,
-    "IgnoreInvRepairRequirements": true
+    "Debug": false
   },
   "Debug": {
-    "PluginTemplate": true,
-    "Permissions": true,
-    "Points": true
+    "PluginTemplate": false,
+    "Permissions": false,
+    "Points": false
   },
   "Commands": {
-    "RepairItemCMD": "/repairitems",
-    "DeletePlayerCMD": "/deleteplayer"
+    "MyStatsCMD": "/mystats",
+    "LeaderboardCMD": "/stats"
   },
   "Messages": {
-    "RepairItemsMSG": "All items has been repaired. {}",
-    "PermErrorMSG": "You don't have permission to use this command.",
-    "PointsErrorMSG": "Not enough points."
+    "Sender": "Point Rewards",
+    "PointsErrorMSG": "Not enough points.",
+    "LostPointsMSG": "You have lost {} points",
+    "GainPointsMSG": "You have gain {} points",
+    "DCPlayerKilledMSG": "Player {} ({}) has been killed by {} ({})",
+    "DCDinoKilledMSG": "Player Killed a {} dino. Points given {}",
+    "MyStatsMSG": "Kills ({}), Deaths ({}), Dino Kills ({}), Tamed Kills ({})",
+    "MyLBStatsMSG": "Rank: Player Kill ({}), Player Death ({}), Dino Kill ({}), Tamed Kill ({})"
   },
   "DiscordBot": {
-    "GuildID": "",
-    "ChannelID": "",
-    "BotToken": "",
+    "Enabled": true,
     "Webhook": "",
     "BotImageURL": ""
   },
   "PluginDBSettings": {
-    "UseMySQL": false,
+    "UseMySQL": true,
     "Host": "",
     "User": "",
     "Password": "",
     "Database": "",
-    "TableName": "PluginTemplate",
+    "TableName": "PointsReward",
     "Port": 3306,
     "MysqlSSLMode": -1,
     "MysqlTLSVersion": "",
     "SQLiteDatabasePath": ""
   },
   "PermissionsDBSettings": {
-    "Enabled": false,
-    "UseMySQL": false,
+    "Enabled": true,
+    "UseMySQL": true,
     "Host": "",
     "User": "",
     "Password": "",
@@ -52,12 +54,12 @@
     "SQLiteDatabasePath": ""
   },
   "PointsDBSettings": {
-    "Enabled": false,
-    "UseMySQL": false,
+    "Enabled": true,
+    "UseMySQL": true,
     "Host": "",
     "User": "",
     "Password": "",
-    "Database": "",
+    "Database": "arksa_dev_cluster",
     "TableName": "ArkShopPlayers",
     "UniqueIDField": "EosId",
     "PointsField": "Points",
@@ -67,6 +69,59 @@
     "MysqlTLSVersion": "",
     "SQLiteDatabasePath": ""
   },
+  "DinoRewards": {
+    "Enabled": true,
+    "Dinos": [
+      {
+        "Blueprint": "Blueprint'/Game/PrimalEarth/Dinos/Dodo/Dodo_Character_BP.Dodo_Character_BP'",
+        "Award": [
+          {
+            "MinLevel": 1,
+            "MaxLevel": 20,
+            "Points": 1
+          },
+          {
+            "MinLevel": 21,
+            "MaxLevel": 50,
+            "Points": 5
+          },
+          {
+            "MinLevel": 51,
+            "MaxLevel": 150,
+            "Points": 20
+          }
+        ]
+      },
+      {
+        "Blueprint": "Blueprint'/Game/PrimalEarth/Dinos/Rex/Rex_Character_BP.Rex_Character_BP'",
+        "Award": [
+          {
+            "MinLevel": 1,
+            "MaxLevel": 50,
+            "Points": 10
+          },
+          {
+            "MinLevel": 51,
+            "MaxLevel": 80,
+            "Points": 20
+          },
+          {
+            "MinLevel": 81,
+            "MaxLevel": 120,
+            "Points": 30
+          }
+        ]
+      }
+    ]
+  },
+  "PlayerRewards": {
+    "Enabled": true,
+    "ReceivePoints": 20,
+    "AdditionalPointsPercent": 3,
+    "LosePointsPercent": 80,
+    "NegativePoints": false,
+    "MessageType": "notification"
+  },
   "PermissionGroups": {
     "Default": {
       "Priority": 99
@@ -74,8 +129,12 @@
     "Admins": {
       "Priority": 1,
       "Commands": {
-        "RepairItemCMD": {
-          "Enabled": false,
+        "MyStatsCMD": {
+          "Enabled": true,
+          "Cost": 0
+        },
+        "LeaderboardCMD": {
+          "Enabled": true,
           "Cost": 0
         }
       }

@@ -13,6 +13,8 @@ bool Hook_APrimalDinoCharacter_Die(APrimalDinoCharacter* _this, float KillingDam
 
         FString killername = killer_shooter_pc->GetPlayerCharacter()->PlayerNameField();
 
+        int points_given = 0;
+
         const bool dino_rewards_enabled = PointRewards::config["DinoRewards"]["Enabled"];
         if (dino_rewards_enabled)
         {
@@ -44,6 +46,7 @@ bool Hook_APrimalDinoCharacter_Die(APrimalDinoCharacter* _this, float KillingDam
                                 const bool negative_points = PointRewards::config["PlayerRewards"].value("NegativePoints", false);
 
                                 const int points = award_entry["Points"];
+                                points_given = points;
                                 if (points >= 0)
                                 {
                                     AddSubPoints(eos_id, points, true, false);
@@ -92,10 +95,22 @@ bool Hook_APrimalDinoCharacter_Die(APrimalDinoCharacter* _this, float KillingDam
             }
         }
 
+        std::string tamed = "";
+
         if (_this->TargetingTeamField() < 50000)
+        {
             AddOrUpdatePlayerStats(eos_id, killer_shooter_pc->GetLinkedPlayerID(), killername, StatsType::DinoKill);
+            tamed = "wild";
+        }
         else
+        {
             AddOrUpdatePlayerStats(eos_id, killer_shooter_pc->GetLinkedPlayerID(), killername, StatsType::TamedKill);
+            tamed = "tamed";
+        }
+
+        std::string msg = fmt::format(PointRewards::config["Messages"].value("DCDinoKilledMSG", "Player Killed a {} dino. Points given {}").c_str(), tamed, points_given);
+
+        SendMessageToDiscord(msg);
     }
 
     return APrimalDinoCharacter_Die_original(_this, KillingDamage, DamageEvent, Killer, DamageCauser);
@@ -131,6 +146,12 @@ bool Hook_AShooterCharacter_Die(AShooterCharacter* shooter_character, float Kill
 
         const int receive_points = PointRewards::config["PlayerRewards"]["ReceivePoints"];
 
+        const int additional_points_percent = PointRewards::config["PlayerRewards"]["AdditionalPointsPercent"];
+        const int lose_points_percent = PointRewards::config["PlayerRewards"]["LosePointsPercent"];
+        const int victim_points = GetPoints(victim_eos_id);
+        const int final_points = receive_points + victim_points * additional_points_percent / 100;
+        const int lose_points = final_points * lose_points_percent / 100;
+
         if (receive_points < 0)
         {
             const bool negative_points = PointRewards::config["PlayerRewards"].value("NegativePoints", false);
@@ -159,14 +180,6 @@ bool Hook_AShooterCharacter_Die(AShooterCharacter* shooter_character, float Kill
         }
         else
         {
-            const int additional_points_percent = PointRewards::config["PlayerRewards"]["AdditionalPointsPercent"];
-            const int lose_points_percent = PointRewards::config["PlayerRewards"]["LosePointsPercent"];
-
-            const int victim_points = GetPoints(victim_eos_id);
-
-            const int final_points = receive_points + victim_points * additional_points_percent / 100;
-            const int lose_points = final_points * lose_points_percent / 100;
-
             if (victim_points > lose_points && AddSubPoints(killer_eos_id, final_points, true, false) &&
                 AddSubPoints(victim_eos_id, lose_points, false, false))
             {
@@ -195,6 +208,10 @@ bool Hook_AShooterCharacter_Die(AShooterCharacter* shooter_character, float Kill
         AddOrUpdatePlayerStats(killer_eos_id, killer_shooter_pc->GetLinkedPlayerID(), killername,StatsType::PlayerKill);
 
         AddOrUpdatePlayerStats(victim_eos_id, victim_shooter_pc->GetLinkedPlayerID(), playername, StatsType::PlayerDeath);
+
+        std::string msg = fmt::format(PointRewards::config["Messages"].value("DiscordMSG", "Player {} ({}) has been killed by {} ({})").c_str(), playername, lose_points, killername, receive_points);
+
+        SendMessageToDiscord(msg);
     }
 
 	return AShooterCharacter_Die_original(shooter_character, KillingDamage, DamageEvent, Killer, DamageCauser);

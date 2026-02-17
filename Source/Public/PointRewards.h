@@ -32,3 +32,11 @@ enum StatsType
 	DinoKill,
 	TamedKill
 };
+
+struct PlayerRanks
+{
+	int killRank = 0;
+	int deathRank = 0;
+	int dinoKillRank = 0;
+	int tamedKillRank = 0;
+};

@@ -2,29 +2,29 @@
 
 void AddOrRemoveCommands(bool addCmd = true)
 {
-	const FString RepairItems = PointRewards::config["Commands"]["RepairItemCMD"].get<std::string>().c_str();
-	if (!RepairItems.IsEmpty())
+	const FString MyStats = PointRewards::config["Commands"]["MyStatsCMD"].get<std::string>().c_str();
+	if (!MyStats.IsEmpty())
 	{
 		if (addCmd)
 		{
-			AsaApi::GetCommands().AddChatCommand(RepairItems, &RepairItemsCallback);
+			AsaApi::GetCommands().AddChatCommand(MyStats, &MyStatsCallback);
 		}
 		else
 		{
-			AsaApi::GetCommands().RemoveChatCommand(RepairItems);
+			AsaApi::GetCommands().RemoveChatCommand(MyStats);
 		}
 	}
 
-	const FString DeletePlayer = PointRewards::config["Commands"]["DeletePlayerCMD"].get<std::string>().c_str();
-	if (!DeletePlayer.IsEmpty())
+	const FString MyLBStats = PointRewards::config["Commands"]["LeaderboardCMD"].get<std::string>().c_str();
+	if (!MyLBStats.IsEmpty())
 	{
 		if (addCmd)
 		{
-			AsaApi::GetCommands().AddChatCommand(DeletePlayer, &DeletePlayerCallback);
+			AsaApi::GetCommands().AddChatCommand(MyLBStats, &MyLBStatsCallback);
 		}
 		else
 		{
-			AsaApi::GetCommands().RemoveChatCommand(DeletePlayer);
+			AsaApi::GetCommands().RemoveChatCommand(MyLBStats);
 		}
 	}
 }
