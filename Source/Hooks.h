@@ -223,10 +223,14 @@ void SetHooks(bool addHooks = true)
 {
 	if (addHooks)
 	{
+        AsaApi::GetHooks().SetHook("APrimalDinoCharacter.Die(float,FDamageEvent&,AController*,AActor*)", &Hook_APrimalDinoCharacter_Die, &APrimalDinoCharacter_Die_original);
+
 		AsaApi::GetHooks().SetHook("AShooterCharacter.Die(float,FDamageEvent&,AController*,AActor*)", &Hook_AShooterCharacter_Die, &AShooterCharacter_Die_original);
 	}
 	else
 	{
+        AsaApi::GetHooks().DisableHook("APrimalDinoCharacter.Die(float,FDamageEvent&,AController*,AActor*)", &Hook_APrimalDinoCharacter_Die);
+
 		AsaApi::GetHooks().DisableHook("AShooterCharacter.Die(float,FDamageEvent&,AController*,AActor*)", &Hook_AShooterCharacter_Die);
 	}
 }
