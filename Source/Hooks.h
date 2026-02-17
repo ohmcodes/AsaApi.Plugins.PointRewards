@@ -48,43 +48,46 @@ bool Hook_APrimalDinoCharacter_Die(APrimalDinoCharacter* _this, float KillingDam
 
                                 const int points = award_entry["Points"];
                                 points_given = points;
+
+                                AShooterPlayerController* killer_controller = AsaApi::GetApiUtils().FindPlayerFromEOSID(eos_id);
+                                //AShooterPlayerController* killer_controlle = static_cast<AShooterPlayerController*>(Killer)
+                                std::string msgPoints = "GainPointsMSG";
+
                                 if (points >= 0)
                                 {
                                     AddSubPoints(eos_id, points, true, false);
+                                    msgPoints = "GainPointsMSG";
                                 }
                                 else if (negative_points || GetPoints(eos_id) - abs(points) >= 0)
                                 {
                                     AddSubPoints(eos_id, points, false, false);
+                                    msgPoints = "LostPointsMSG";
+                                }
 
-                                    AShooterPlayerController* killer_controller = AsaApi::GetApiUtils().FindPlayerFromEOSID(eos_id);
-                                    //AShooterPlayerController* killer_controlle = static_cast<AShooterPlayerController*>(Killer)
-                                    if (killer_controller)
+                                if (killer_controller)
+                                {
+                                    const std::string message_type = PointRewards::config["PlayerRewards"].value("MessageType", "notification");
+
+                                    if (message_type == "notification")
                                     {
-                                        const std::string message_type = PointRewards::config["PlayerRewards"].value("MessageType", "notification");
+                                        const float display_scale = PointRewards::config["PlayerRewards"].value("NotificationScale", 1.3f);
+                                        const float display_time = PointRewards::config["PlayerRewards"].value("NotificationDisplayTime", 10.0f);
 
-                                        if (message_type == "notification")
-                                        {
-                                            const float display_scale = PointRewards::config["PlayerRewards"].value("NotificationScale", 1.3f);
-                                            const float display_time = PointRewards::config["PlayerRewards"].value("NotificationDisplayTime", 10.0f);
-
-
-
-                                            AsaApi::GetApiUtils().SendNotification(
-                                                killer_controller,
-                                                FColorList::Red,
-                                                display_scale,
-                                                display_time,
-                                                nullptr,
-                                                PointRewards::config["Messages"].value("LostPointsMSG", "You have lost {} points").c_str(), abs(points));
-                                        }
-                                        else if (message_type == "chat")
-                                        {
-                                            AsaApi::GetApiUtils().SendChatMessage(
-                                                killer_controller,
-                                                PointRewards::config["Messages"].value("Sender", "Point Rewards").c_str(),
-                                                PointRewards::config["Messages"].value("LostPointsMSG", "You have lost {} points").c_str(),
-                                                abs(points));
-                                        }
+                                        AsaApi::GetApiUtils().SendNotification(
+                                            killer_controller,
+                                            FColorList::Red,
+                                            display_scale,
+                                            display_time,
+                                            nullptr,
+                                            PointRewards::config["Messages"].value(msgPoints, "You have lost {} points").c_str(), abs(points));
+                                    }
+                                    else if (message_type == "chat")
+                                    {
+                                        AsaApi::GetApiUtils().SendChatMessage(
+                                            killer_controller,
+                                            PointRewards::config["Messages"].value("Sender", "Point Rewards").c_str(),
+                                            PointRewards::config["Messages"].value(msgPoints, "You have lost {} points").c_str(),
+                                            abs(points));
                                     }
                                 }
 
