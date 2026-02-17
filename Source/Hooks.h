@@ -4,6 +4,8 @@ DECLARE_HOOK(APrimalDinoCharacter_Die, bool, APrimalDinoCharacter*, float, FDama
 bool Hook_APrimalDinoCharacter_Die(APrimalDinoCharacter* _this, float KillingDamage, FDamageEvent* DamageEvent,
     AController* Killer, AActor* DamageCauser)
 {
+    Log::GetLog()->info("Killing dino");
+
     if (Killer && !Killer->IsLocalController() && Killer->IsA(AShooterPlayerController::GetPrivateStaticClass()) &&
         _this->TargetingTeamField() != Killer->TargetingTeamField())
     {
