@@ -82,7 +82,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Includes;$(SolutionDir)Source\Public;$(SolutionDir)..\..\ClonedREPO\AsaApi\AsaApi\Core\Public;$(SolutionDir)..\..\ClonedREPO\AsaApi\AsaApi\Core\Public\API\UE;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Includes;$(SolutionDir)Source\Public;$(SolutionDir)..\..\ClonedREPO\AsaApi_released\AsaApi\Core\Public;$(SolutionDir)..\..\ClonedREPO\AsaApi_released\AsaApi\Core\Public\API\UE;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
@@ -91,7 +91,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(SolutionDir)..\..\ClonedREPO\AsaApi\out_lib\AsaApi.lib;$(SolutionDir)Libs\mysqlclient.lib;Ws2_32.lib;crypt32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)..\..\ClonedREPO\AsaApi_released\out_lib\AsaApi.lib;$(SolutionDir)Libs\mysqlclient.lib;Ws2_32.lib;crypt32.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>mkdir "$(SolutionDir)Output\$(ProjectName)\"
@@ -100,11 +100,11 @@ copy /y "$(TargetPath)" "$(SolutionDir)Output\$(ProjectName)\$(TargetFileName)"
 copy /y "$(SolutionDir)Configs\config.json" "$(SolutionDir)Output\$(ProjectName)\config.json"
 copy /y "$(SolutionDir)Configs\config-commented.json" "$(SolutionDir)Output\$(ProjectName)\config-commented.json"
 copy /y "$(SolutionDir)Configs\PluginInfo.json" "$(SolutionDir)Output\$(ProjectName)\PluginInfo.json"
-mkdir "F:\WGSM\servers\1\serverfiles\ShooterGame\Binaries\Win64\ArkApi\Plugins\$(ProjectName)\"
-copy /y "$(TargetDir)$(TargetFileName)" "F:\WGSM\servers\1\serverfiles\ShooterGame\Binaries\Win64\ArkApi\Plugins\$(ProjectName)\$(TargetFileName).arkapi"
-copy /y "$(TargetPath)" "F:\WGSM\servers\1\serverfiles\ShooterGame\Binaries\Win64\ArkApi\Plugins\$(ProjectName)\$(TargetFileName)"
-copy /y "$(SolutionDir)Configs\config-dev.json" "F:\WGSM\servers\1\serverfiles\ShooterGame\Binaries\Win64\ArkApi\Plugins\$(ProjectName)\config.json"
-copy /y "$(SolutionDir)Configs\PluginInfo.json" "F:\WGSM\servers\1\serverfiles\ShooterGame\Binaries\Win64\ArkApi\Plugins\$(ProjectName)\PluginInfo.json
+mkdir "D:\WGSM\servers\1\serverfiles\ShooterGame\Binaries\Win64\ArkApi\Plugins\$(ProjectName)\"
+copy /y "$(TargetDir)$(TargetFileName)" "D:\WGSM\servers\1\serverfiles\ShooterGame\Binaries\Win64\ArkApi\Plugins\$(ProjectName)\$(TargetFileName).arkapi"
+copy /y "$(TargetPath)" "D:\WGSM\servers\1\serverfiles\ShooterGame\Binaries\Win64\ArkApi\Plugins\$(ProjectName)\$(TargetFileName)"
+copy /y "$(SolutionDir)Configs\config-dev.json" "D:\WGSM\servers\1\serverfiles\ShooterGame\Binaries\Win64\ArkApi\Plugins\$(ProjectName)\config.json"
+copy /y "$(SolutionDir)Configs\PluginInfo.json" "D:\WGSM\servers\1\serverfiles\ShooterGame\Binaries\Win64\ArkApi\Plugins\$(ProjectName)\PluginInfo.json
 git add -A
 git commit -m "Auto push after build" -m "Co-authored-by: ohmcodes &lt;ohmcodes@gmail.com&gt;" -m "Co-authored-by: Mark-Oasan &lt;markoasan@gmail.com&gt;"
 git push</Command>
